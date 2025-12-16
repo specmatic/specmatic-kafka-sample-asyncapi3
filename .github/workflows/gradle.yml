@@ -26,6 +26,12 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@dbbdc275be76ac10734476cc723d82dfe7ec6eda # v3.4.2
 
+    - name: Save Specmatic license
+      if: github.ref == 'refs/heads/main'
+      run: |
+        mkdir -p ~/.specmatic
+        echo "${{ secrets.SPECMATIC_LICENSE_KEY }}" > ~/.specmatic/specmatic-license.txt
+
     - name: Build with Gradle Wrapper
       run: ./gradlew build
 
@@ -43,12 +49,6 @@ jobs:
       if: always() # Run even if tests fail
       with:
         report-path: './build/reports/specmatic/kafka/test/ctrf/*.json'
-
-    - name: Save Specmatic license
-      if: github.ref == 'refs/heads/main'
-      run: |
-        mkdir -p ~/.specmatic
-        echo "${{ secrets.SPECMATIC_LICENSE_KEY }}" > ~/.specmatic/specmatic-license.txt
 
     - name: Run Specmatic Insights Build Reporter
       if: github.ref == 'refs/heads/main'
