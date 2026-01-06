@@ -51,7 +51,9 @@ jobs:
         report-path: './build/reports/specmatic/async/test/ctrf/*.json'
 
     - name: Run Specmatic Insights Build Reporter
-      if: github.ref == 'refs/heads/main'
+      #      if: github.ref == 'refs/heads/main'
+      # re-enable when reporter is fixed
+      if: false
       run: |
         docker run \
           -v ${{ github.workspace }}:/usr/src/app \
