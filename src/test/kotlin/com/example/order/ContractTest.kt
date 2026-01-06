@@ -1,8 +1,7 @@
 package com.example.order
 
-import io.specmatic.async.core.constants.AVAILABLE_SERVERS
-import io.specmatic.async.core.constants.SPECMATIC_KAFKA_OVERLAY_FILE
-import io.specmatic.kafka.test.SpecmaticKafkaContractTest
+import io.specmatic.async.constants.SPECMATIC_OVERLAY_FILE
+import io.specmatic.async.test.SpecmaticAsyncContractTest
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
@@ -14,7 +13,7 @@ import org.springframework.kafka.test.EmbeddedKafkaZKBroker
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Disabled("Fix flakiness and then enable")
-class ContractTest : SpecmaticKafkaContractTest {
+class ContractTest : SpecmaticAsyncContractTest {
     private lateinit var embeddedKafka: EmbeddedKafkaBroker
 
     @BeforeAll
@@ -31,8 +30,7 @@ class ContractTest : SpecmaticKafkaContractTest {
                 "out-for-delivery-orders"
             ).kafkaPorts(9092)
         runCatching { embeddedKafka.afterPropertiesSet() }
-        System.setProperty(AVAILABLE_SERVERS, "localhost:9092")
-        System.setProperty(SPECMATIC_KAFKA_OVERLAY_FILE, "src/test/resources/spec_overlay.yaml")
+        System.setProperty(SPECMATIC_OVERLAY_FILE, "src/test/resources/spec_overlay.yaml")
         Thread.sleep(1000)
     }
 

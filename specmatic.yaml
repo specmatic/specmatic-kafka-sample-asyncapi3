@@ -3,7 +3,13 @@ contracts:
   - git:
       url: "https://github.com/specmatic/specmatic-order-contracts.git"
     provides:
-      - io/specmatic/examples/store/asyncapi/3_0_0/order_service_async_v4.yaml
+      - specs:
+          - io/specmatic/examples/store/asyncapi/3_0_0/order_service_async_v4.yaml
+        specType: asyncapi
+        config:
+          servers:
+            - host: localhost:9092
+              protocol: kafka
 report:
   formatters:
     - type: ctrf
