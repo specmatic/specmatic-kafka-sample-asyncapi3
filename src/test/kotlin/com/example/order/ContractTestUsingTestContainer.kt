@@ -55,11 +55,10 @@ class ContractTestUsingTestContainer {
     }
 
     private val testContainer: GenericContainer<*> =
-        GenericContainer("specmatic/specmatic-kafka")
+        GenericContainer("specmatic/specmatic-async")
             .withImagePullPolicy(PullPolicy.alwaysPull())
             .withCommand(
                 "test",
-                "--broker=localhost:9092",
                 "--overlay=spec_overlay.yaml"
             )
             .withFileSystemBind(
@@ -81,7 +80,6 @@ class ContractTestUsingTestContainer {
     @Test
     fun specmaticContractTest() {
         testContainer.start()
-        val hasSucceeded = testContainer.logs.contains("Failed: 0")
-        assertThat(hasSucceeded).isTrue()
+        assertThat(testContainer.logs).contains("Failed: 0").doesNotContain("Passed: 0")
     }
 }
