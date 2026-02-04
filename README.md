@@ -50,6 +50,7 @@ You will now see a detailed HTML report in `build/reports/index.html` with the m
    ./gradlew bootRun
    ```
 4. Run the contract tests.
+   - On Unix and Windows Powershell:
    ```shell
-   docker run --network host -v "$PWD/specmatic.yaml:/usr/src/app/specmatic.yaml" -v "$PWD/src/test/resources/spec_overlay.yaml:/usr/src/app/spec_overlay.yaml" -v "$PWD/build/reports:/usr/src/app/build/reports" specmatic/specmatic-kafka test --broker localhost:9092 --overlay=spec_overlay.yaml
+   docker run --rm --network host -v "$(pwd):/usr/src/app" specmatic/enterprise test --overlay=src/test/resources/spec_overlay.yaml
    ```

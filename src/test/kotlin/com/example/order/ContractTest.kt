@@ -1,7 +1,7 @@
 package com.example.order
 
 import io.specmatic.async.constants.SPECMATIC_OVERLAY_FILE
-import io.specmatic.async.test.SpecmaticAsyncContractTest
+import io.specmatic.enterprise.SpecmaticContractTest
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
@@ -13,7 +13,7 @@ import org.springframework.kafka.test.EmbeddedKafkaZKBroker
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Disabled("Fix flakiness and then enable")
-class ContractTest : SpecmaticAsyncContractTest {
+class ContractTest : SpecmaticContractTest {
     private lateinit var embeddedKafka: EmbeddedKafkaBroker
 
     @BeforeAll
