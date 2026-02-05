@@ -12,6 +12,7 @@ import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.images.PullPolicy
+import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
 @Testcontainers
@@ -56,23 +57,59 @@ class ContractTestUsingTestContainer {
 
     private val testContainer: GenericContainer<*> =
         GenericContainer("specmatic/enterprise")
-            .withImagePullPolicy(PullPolicy.alwaysPull())
-            .withCommand("test", "--overlay=spec_overlay.yaml",)
+//            .withImagePullPolicy(PullPolicy.alwaysPull())
+            .withCommand("test")
             .withFileSystemBind(
                 "./specmatic.yaml",
                 "/usr/src/app/specmatic.yaml",
                 BindMode.READ_ONLY,
-            ).withFileSystemBind(
-                "./src/test/resources/spec_overlay.yaml",
-                "/usr/src/app/spec_overlay.yaml",
+            )
+            .withFileSystemBind(
+                "./specs",
+                "/usr/src/app/specs",
                 BindMode.READ_ONLY,
-            ).withFileSystemBind(
+            )
+            .withFileSystemBind(
+                "./examples",
+                "/usr/src/app/examples",
+                BindMode.READ_ONLY,
+            )
+            .withFileSystemBind(
                 "./build/reports/specmatic",
                 "/usr/src/app/build/reports/specmatic",
                 BindMode.READ_WRITE,
             ).waitingFor(Wait.forLogMessage(".*Failed:.*", 1))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }
+
+    @Container
+    private val mockContainer: GenericContainer<*> =
+        GenericContainer("specmatic/enterprise")
+            .withCommand("mock")
+            .withFileSystemBind(
+                "./specmatic.yaml",
+                "/usr/src/app/specmatic.yaml",
+                BindMode.READ_ONLY,
+            )
+            .withFileSystemBind(
+                "./specs",
+                "/usr/src/app/specs",
+                BindMode.READ_ONLY,
+            )
+            .withFileSystemBind(
+                "./examples",
+                "/usr/src/app/examples",
+                BindMode.READ_ONLY,
+            )
+            .withFileSystemBind(
+                "./build/reports/specmatic",
+                "/usr/src/app/build/reports/specmatic",
+                BindMode.READ_WRITE,
+            )
+            .waitingFor(Wait.forHttp("/actuator/health").forStatusCode(200))
+            .withNetworkMode("host")
+            .withLogConsumer { print(it.utf8String) }
+
 
     @Test
     fun specmaticContractTest() {
