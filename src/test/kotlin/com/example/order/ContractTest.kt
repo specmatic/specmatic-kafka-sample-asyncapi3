@@ -30,7 +30,6 @@ class ContractTest : SpecmaticContractTest {
                 "out-for-delivery-orders"
             ).kafkaPorts(9092)
         runCatching { embeddedKafka.afterPropertiesSet() }
-        System.setProperty(SPECMATIC_OVERLAY_FILE, "src/test/resources/spec_overlay.yaml")
         Thread.sleep(1000)
     }
 

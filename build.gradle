@@ -39,6 +39,9 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web') {
         exclude group: 'ch.qos.logback', module: 'logback-classic'
     }
+    implementation('org.springframework.boot:spring-boot-starter-webflux') {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0"
@@ -80,4 +83,6 @@ test {
             }
         }
     }
+}
+compileKotlin {
 }
