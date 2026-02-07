@@ -55,9 +55,9 @@ class ContractTestUsingTestContainer {
     }
 
     private val testContainer: GenericContainer<*> =
-        GenericContainer("specmatic/enterprise")
-            .withImagePullPolicy(PullPolicy.alwaysPull())
-            .withCommand("test", "--overlay=spec_overlay.yaml",)
+        GenericContainer("specmatic/enterprise:1.0.5-SNAPSHOT")
+//            .withImagePullPolicy(PullPolicy.alwaysPull())
+            .withCommand("test")
             .withFileSystemBind(
                 "./specmatic.yaml",
                 "/usr/src/app/specmatic.yaml",
