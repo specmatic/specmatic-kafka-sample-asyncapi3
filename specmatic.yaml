@@ -1,37 +1,53 @@
-version: 2
-contracts:
-#  - git:
-#      url: "https://github.com/specmatic/specmatic-order-contracts.git"
-#    provides:
-#      - specs:
-#          - io/specmatic/examples/store/asyncapi/3_0_0/order_service_async_v4.yaml
-#        specType: asyncapi
-#        config:
-#          servers:
-#            - host: localhost:9092
-#              protocol: kafka
+version: 3
+systemUnderTest:
+  service:
+    $ref: "#/components/services/orderAsyncService"
+    runOptions:
+      $ref: "#/components/runOptions/orderAsyncServiceTest"
+    data:
+      examples:
+        - directories:
+            - examples/async-order-service
 
-  - provides:
-      - specs:
-          - specs/async-order-service.yaml
-        specType: asyncapi
-        config:
-          servers:
-            - host: localhost:9092
-              protocol: kafka
-
-  - consumes:
-      - specs:
-          - specs/order-status-service.yaml
-        specType: openapi
-        config:
-          baseUrl: http://localhost:8080
+dependencies:
+  services:
+    - service:
+        $ref: "#/components/services/orderStatusService"
+        runOptions:
+          $ref: "#/components/runOptions/orderStatusServiceMock"
+        data:
           examples:
-            - examples/order-status-service
-report:
-  formatters:
-    - type: ctrf
+            - directories:
+                - examples/order-status-service
 
-examples:
-  - examples/async-order-service
-
+components:
+  sources:
+    specmaticOrderContracts:
+      filesystem:
+        directory: .
+  services:
+    orderAsyncService:
+      definitions:
+        - definition:
+            source:
+              $ref: "#/components/sources/specmaticOrderContracts"
+            specs:
+              - specs/async-order-service.yaml
+    orderStatusService:
+      definitions:
+        - definition:
+            source:
+              $ref: "#/components/sources/specmaticOrderContracts"
+            specs:
+              - specs/order-status-service.yaml
+  runOptions:
+    orderAsyncServiceTest:
+      asyncapi:
+        type: test
+        servers:
+          - host: "kafka:9092"
+            protocol: kafka
+    orderStatusServiceMock:
+      openapi:
+        type: mock
+        baseUrl: "http://0.0.0.0:8080"

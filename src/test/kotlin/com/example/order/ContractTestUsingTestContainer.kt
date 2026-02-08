@@ -11,7 +11,6 @@ import org.springframework.kafka.test.EmbeddedKafkaZKBroker
 import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
-import org.testcontainers.images.PullPolicy
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -57,7 +56,6 @@ class ContractTestUsingTestContainer {
 
     private val testContainer: GenericContainer<*> =
         GenericContainer("specmatic/enterprise")
-//            .withImagePullPolicy(PullPolicy.alwaysPull())
             .withCommand("test")
             .withFileSystemBind(
                 "./specmatic.yaml",
