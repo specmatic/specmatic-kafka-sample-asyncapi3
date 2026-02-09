@@ -67,14 +67,7 @@ class ContractTestUsingTestContainer {
                 BindMode.READ_WRITE,
             )
             .apply {
-                if (isLinuxCI()) {
-                    withEnv("EX_DIR", System.getProperty("EX_DIR"))
-                    withFileSystemBind(
-                        "build",
-                        "/usr/src/app/build",
-                        BindMode.READ_WRITE,
-                    )
-                }
+                if (isLinuxCI()) withEnv("EX_DIR", System.getProperty("EX_DIR"))
             }
             .waitingFor(Wait.forLogMessage(".*Failed:.*", 1))
             .withNetworkMode("host")
@@ -90,14 +83,7 @@ class ContractTestUsingTestContainer {
                 BindMode.READ_WRITE,
             )
             .apply {
-                if (isLinuxCI()) {
-                    withEnv("EX_DIR", System.getProperty("EX_DIR"))
-                    withFileSystemBind(
-                        "build",
-                        "/usr/src/app/build",
-                        BindMode.READ_WRITE,
-                    )
-                }
+                if (isLinuxCI()) withEnv("EX_DIR", System.getProperty("EX_DIR"))
             }
             .waitingFor(Wait.forHttp("/actuator/health").forStatusCode(200))
             .withNetworkMode("host")

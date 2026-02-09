@@ -6,7 +6,7 @@ import java.nio.file.Path
 private const val EXAMPLES_DIR = "EX_DIR"
 
 object LocalExamplesDir {
-    fun setup(): String {
+    fun setup() {
         val sourceDir = Path.of("examples")
         val targetDir = Path.of("build/tmp/specmatic/local-examples")
 
@@ -32,10 +32,8 @@ object LocalExamplesDir {
             "Could not find any mock URL to rewrite under ${targetDir.toAbsolutePath()}"
         }
 
-        val examplesDirPath = targetDir.toAbsolutePath().toString()
-        System.setProperty(EXAMPLES_DIR, examplesDirPath)
+        System.setProperty(EXAMPLES_DIR, targetDir.toAbsolutePath().toString())
         println("Examples directory set to ${System.getProperty(EXAMPLES_DIR)} with $replacementCount URL replacements")
-        return examplesDirPath
     }
 
     fun tearDown() {
