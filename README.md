@@ -1,7 +1,7 @@
 # Specmatic Kafka Sample
 
 * [Specmatic Website](https://specmatic.io)
-* [Specmatic Documentation](https://specmatic.io/documentation.html)
+* [Specmatic Documentation](https://docs.specmatic.io)
 
 This sample project demonstrates how we can run contract tests against a service which interacts with a kafka broker.
 
