@@ -42,15 +42,15 @@ class ContractTestUsingTestContainer {
         @JvmStatic
         fun isNonCIOrLinux(): Boolean =
             System.getenv("CI") != "true" || System.getProperty("os.name").lowercase().contains("linux")
+    }
 
-        @JvmStatic
-        fun isLinuxCI(): Boolean {
-            return System.getenv("CI") == "true" && System.getProperty("os.name").lowercase().contains("linux")
-        }
+    private fun isLinuxCI(): Boolean {
+        return System.getenv("CI") == "true" && System.getProperty("os.name").lowercase().contains("linux")
+    }
 
-        init {
-            if(isLinuxCI()) LocalExamplesDir.setup()
-        }
+    @BeforeAll
+    fun setup() {
+        if(isLinuxCI()) LocalExamplesDir.setup()
     }
 
     @AfterAll
@@ -66,9 +66,6 @@ class ContractTestUsingTestContainer {
                 "/usr/src/app",
                 BindMode.READ_WRITE,
             )
-            .apply {
-                if (isLinuxCI()) withEnv("EX_DIR", System.getProperty("EX_DIR"))
-            }
             .waitingFor(Wait.forLogMessage(".*Failed:.*", 1))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }
@@ -82,9 +79,6 @@ class ContractTestUsingTestContainer {
                 "/usr/src/app",
                 BindMode.READ_WRITE,
             )
-            .apply {
-                if (isLinuxCI()) withEnv("EX_DIR", System.getProperty("EX_DIR"))
-            }
             .waitingFor(Wait.forHttp("/actuator/health").forStatusCode(200))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }
