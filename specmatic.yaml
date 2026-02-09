@@ -12,9 +12,9 @@ systemUnderTest:
 dependencies:
   services:
     - service:
-        $ref: "#/components/services/orderStatusService"
+        $ref: "#/components/services/taxService"
         runOptions:
-          $ref: "#/components/runOptions/orderStatusServiceMock"
+          $ref: "#/components/runOptions/taxServiceMock"
         data:
           examples:
             - directories:
@@ -33,13 +33,13 @@ components:
               $ref: "#/components/sources/specmaticOrderContracts"
             specs:
               - specs/async-order-service.yaml
-    orderStatusService:
+    taxService:
       definitions:
         - definition:
             source:
               $ref: "#/components/sources/specmaticOrderContracts"
             specs:
-              - specs/order-status-service.yaml
+              - specs/tax-service.yaml
   runOptions:
     orderAsyncServiceTest:
       asyncapi:
@@ -47,7 +47,7 @@ components:
         servers:
           - host: "localhost:9092"
             protocol: kafka
-    orderStatusServiceMock:
+    taxServiceMock:
       openapi:
         type: mock
         baseUrl: "http://0.0.0.0:8080"

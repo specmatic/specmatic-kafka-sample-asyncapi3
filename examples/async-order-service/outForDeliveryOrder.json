@@ -33,13 +33,13 @@
       "type": "http",
       "http-request": {
         "baseUrl": "http://host.docker.internal:8080",
-        "path": "/_specmatic/verify?exampleId=order-status-for-id-456",
+        "path": "/_specmatic/verify?exampleId=tax-invoice-for-order-456",
         "method": "GET"
       },
       "http-response": {
         "status": 200,
         "body": {
-          "order-status-for-id-456": "$match(exact: 1)"
+          "tax-invoice-for-order-456": "$match(exact: 1)"
         }
       },
       "timeout": "PT20S"

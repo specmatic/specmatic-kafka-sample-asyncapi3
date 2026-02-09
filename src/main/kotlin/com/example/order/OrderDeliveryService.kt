@@ -1,5 +1,6 @@
 package com.example.order
 
+import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -13,7 +14,7 @@ private const val ORDER_OUT_FOR_DELIVERY_TOPIC = "out-for-delivery-orders"
 @Service
 class OrderDeliveryService(
     private val orderRepository: OrderRepository,
-    private val orderStatusClient: OrderStatusClient
+    private val taxServiceClient: TaxServiceClient
 ) {
     private val mapper = jacksonObjectMapper().apply {
         configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true)
@@ -47,11 +48,17 @@ class OrderDeliveryService(
                 // Order not found, proceed with processing
             }
 
-            // Fetch the current order status from the status service
-            val currentStatus = orderStatusClient.fetchStatus(request.orderId)
-            println("[$SERVICE_NAME] Fetched status '$currentStatus' for orderId '${request.orderId}'")
+            val currentStatus = OrderStatus.SHIPPED
 
-            // Save order with the fetched status
+            val invoice = taxServiceClient.raiseInvoice(
+                orderId = request.orderId,
+                invoiceDate = request.deliveryDate
+            )
+            println(
+                "[$SERVICE_NAME] Tax invoice '${invoice.invoiceId}' raised with status '${invoice.status}' for orderId '${request.orderId}'"
+            )
+
+            // Save order with status maintained by this service
             orderRepository.save(
                 Order(
                     id = request.orderId,
@@ -63,7 +70,7 @@ class OrderDeliveryService(
 
             // Only acknowledge after successful processing
             ack.acknowledge()
-        } catch (e: com.fasterxml.jackson.core.JsonProcessingException) {
+        } catch (e: JsonProcessingException) {
             // Malformed message: log and acknowledge to skip it (could send to DLQ in production)
             println("[$SERVICE_NAME] Failed to parse message, acknowledging to skip: $orderDeliveryRequest")
             e.printStackTrace()
