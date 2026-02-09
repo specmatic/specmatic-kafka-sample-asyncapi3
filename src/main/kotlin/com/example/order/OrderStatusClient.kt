@@ -9,9 +9,9 @@ import java.time.Duration
 @Component
 class OrderStatusClient(
     private val webClient: WebClient,
-    @Value("\${order-status-service.base-url}") private val baseUrl: String,
-    @Value("\${order-status-service.timeout-seconds:3}") private val timeoutSeconds: Long,
-    @Value("\${order-status-service.retry-attempts:1}") private val retryAttempts: Long
+    @param:Value($$"${order-status-service.base-url}") private val baseUrl: String,
+    @param:Value($$"${order-status-service.timeout-seconds:3}") private val timeoutSeconds: Long,
+    @param:Value($$"${order-status-service.retry-attempts:1}") private val retryAttempts: Long
 ) {
     fun fetchStatus(orderId: Int): OrderStatus {
         val path = "$baseUrl/orders/$orderId/status"

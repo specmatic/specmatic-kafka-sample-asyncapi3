@@ -39,7 +39,7 @@ class OrderDeliveryService(
 
             // Check if order already processed (idempotency)
             try {
-                val existingOrder = orderRepository.findById(request.orderId, OrderStatus.SHIPPED)
+                orderRepository.findById(request.orderId, OrderStatus.SHIPPED)
                 println("[$SERVICE_NAME] Order ${request.orderId} already processed with status SHIPPED, skipping")
                 ack.acknowledge()
                 return
