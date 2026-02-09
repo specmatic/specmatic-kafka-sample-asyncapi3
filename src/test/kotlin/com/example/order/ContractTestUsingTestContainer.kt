@@ -1,6 +1,7 @@
 package com.example.order
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.condition.EnabledIf
@@ -12,6 +13,7 @@ import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.io.File
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -37,9 +39,31 @@ import org.testcontainers.junit.jupiter.Testcontainers
 class ContractTestUsingTestContainer {
 
     companion object {
+        private const val LOCAL_EXAMPLES_DIR = "build/tmp/specmatic/local-examples"
+        private val isCI = System.getenv("CI") == "true"
+
         @JvmStatic
         fun isNonCIOrLinux(): Boolean =
-            System.getenv("CI") != "true" || System.getProperty("os.name").lowercase().contains("linux")
+            !isCI || System.getProperty("os.name").lowercase().contains("linux")
+
+        @JvmStatic
+        @BeforeAll
+        fun prepareLocalExamples() {
+            val localExamplesDir = File(LOCAL_EXAMPLES_DIR)
+            localExamplesDir.deleteRecursively()
+            localExamplesDir.mkdirs()
+
+            File("examples").copyRecursively(localExamplesDir, overwrite = true)
+
+            // On CI (Linux), replace host.docker.internal with localhost since we use --network=host
+            if (isCI) {
+                localExamplesDir.walkTopDown().filter { it.isFile && it.extension == "json" }.forEach { file ->
+                    val content = file.readText()
+                    val updatedContent = content.replace("host.docker.internal", "localhost")
+                    file.writeText(updatedContent)
+                }
+            }
+        }
     }
 
 
@@ -47,11 +71,11 @@ class ContractTestUsingTestContainer {
     private val testContainer: GenericContainer<*> =
         GenericContainer("specmatic/enterprise")
             .withCommand("test")
-            .withFileSystemBind(
-                ".",
-                "/usr/src/app",
-                BindMode.READ_WRITE,
-            )
+            .withFileSystemBind("specmatic.yaml", "/usr/src/app/specmatic.yaml", BindMode.READ_ONLY)
+            .withFileSystemBind("specs", "/usr/src/app/specs", BindMode.READ_ONLY)
+            .withFileSystemBind(LOCAL_EXAMPLES_DIR, "/usr/src/app/$LOCAL_EXAMPLES_DIR", BindMode.READ_ONLY)
+            .withFileSystemBind("build/reports/specmatic", "/usr/src/app/build/reports/specmatic", BindMode.READ_WRITE)
+            .withEnv("EX_DIR", LOCAL_EXAMPLES_DIR)
             .waitingFor(Wait.forLogMessage(".*Failed:.*", 1))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }
@@ -60,11 +84,11 @@ class ContractTestUsingTestContainer {
     private val mockContainer: GenericContainer<*> =
         GenericContainer("specmatic/enterprise")
             .withCommand("mock")
-            .withFileSystemBind(
-                ".",
-                "/usr/src/app",
-                BindMode.READ_WRITE,
-            )
+            .withFileSystemBind("specmatic.yaml", "/usr/src/app/specmatic.yaml", BindMode.READ_ONLY)
+            .withFileSystemBind("specs", "/usr/src/app/specs", BindMode.READ_ONLY)
+            .withFileSystemBind(LOCAL_EXAMPLES_DIR, "/usr/src/app/$LOCAL_EXAMPLES_DIR", BindMode.READ_ONLY)
+            .withFileSystemBind("build/reports/specmatic/stub", "/usr/src/app/build/reports/specmatic/stub", BindMode.READ_WRITE)
+            .withEnv("EX_DIR", LOCAL_EXAMPLES_DIR)
             .waitingFor(Wait.forHttp("/actuator/health").forStatusCode(200))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }
