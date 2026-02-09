@@ -42,15 +42,28 @@ You will now see a detailed HTML report in `build/reports/index.html` with the m
    ```
 2. Create the required topics in the running Kafka broker.
    # Copy the topic creation script into the Kafka container and execute it:
+    ```shell
    docker cp create-topics.sh kafka:/tmp/create-topics.sh
    docker exec kafka bash /tmp/create-topics.sh
    ```
+   
 3. Run the application.
    ```shell
    ./gradlew bootRun
    ```
-4. Run the contract tests.
+   
+4. Run the Order Status Service as a mock server using the specmatic enterprise docker image.
+   ```shell
+   docker run --rm --network host -v "$(pwd):/usr/src/app" specmatic/enterprise mock
+   ```
+   
+5. Run the contract tests.
    - On Unix and Windows Powershell:
    ```shell
-   docker run --rm --network host -v "$(pwd):/usr/src/app" specmatic/enterprise test --overlay=src/test/resources/spec_overlay.yaml
+   docker run --rm --network host -v "$(pwd):/usr/src/app" specmatic/enterprise test
+   ```
+
+6. Bring down the Kafka broker after the tests are done.
+   ```shell
+   docker compose down
    ```

@@ -14,7 +14,7 @@
       "type": "http",
       "wait": "PT2S",
       "http-request": {
-        "baseUrl": "http://order-service:9000",
+        "baseUrl": "http://localhost:9000",
         "path": "/orders/456?status=SHIPPED",
         "method": "GET"
       },
@@ -32,7 +32,7 @@
     {
       "type": "http",
       "http-request": {
-        "baseUrl": "http://specmatic-mock:8080",
+        "baseUrl": "http://host.docker.internal:8080",
         "path": "/_specmatic/verify?exampleId=order-status-for-id-456",
         "method": "GET"
       },

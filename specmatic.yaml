@@ -7,7 +7,7 @@ systemUnderTest:
     data:
       examples:
         - directories:
-            - examples/async-order-service
+            - "${EX_DIR:examples}"
 
 dependencies:
   services:
@@ -18,7 +18,7 @@ dependencies:
         data:
           examples:
             - directories:
-                - examples/order-status-service
+                - "${EX_DIR:examples}"
 
 components:
   sources:
@@ -45,7 +45,7 @@ components:
       asyncapi:
         type: test
         servers:
-          - host: "kafka:9092"
+          - host: "localhost:9092"
             protocol: kafka
     orderStatusServiceMock:
       openapi:

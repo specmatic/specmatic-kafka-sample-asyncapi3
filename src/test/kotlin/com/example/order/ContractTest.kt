@@ -1,41 +1,42 @@
 package com.example.order
 
-import io.specmatic.async.constants.SPECMATIC_OVERLAY_FILE
 import io.specmatic.enterprise.SpecmaticContractTest
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestInstance
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.kafka.test.EmbeddedKafkaBroker
-import org.springframework.kafka.test.EmbeddedKafkaZKBroker
+import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@EmbeddedKafka(
+    ports = [9092],
+    topics = [
+        "new-orders",
+        "wip-orders",
+        "to-be-cancelled-orders",
+        "cancelled-orders",
+        "accepted-orders",
+        "out-for-delivery-orders"
+    ],
+    brokerProperties = [
+        "listeners=PLAINTEXT://0.0.0.0:9092",
+        "advertised.listeners=PLAINTEXT://localhost:9092"
+    ],
+    bootstrapServersProperty = "spring.kafka.bootstrap-servers"
+)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled("Fix flakiness and then enable")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class ContractTest : SpecmaticContractTest {
-    private lateinit var embeddedKafka: EmbeddedKafkaBroker
-
     @BeforeAll
-    fun setup() {
-        embeddedKafka =
-            EmbeddedKafkaZKBroker(
-                1,
-                false,
-                "new-orders",
-                "wip-orders",
-                "to-be-cancelled-orders",
-                "cancelled-orders",
-                "accepted-orders",
-                "out-for-delivery-orders"
-            ).kafkaPorts(9092)
-        runCatching { embeddedKafka.afterPropertiesSet() }
-        Thread.sleep(1000)
+    fun setUp() {
+        LocalExamplesDir.setup()
     }
 
     @AfterAll
     fun tearDown() {
-        embeddedKafka.destroy()
-        Thread.sleep(200)
+//        SpecmaticContractTest.teardown()
+//        Thread.sleep(20000)
+        LocalExamplesDir.tearDown()
     }
 }
