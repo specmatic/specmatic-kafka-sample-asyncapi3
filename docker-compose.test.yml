@@ -82,4 +82,4 @@ services:
       - ./specs:/usr/src/app/specs
       - ./examples:/usr/src/app/examples
       - ./build/reports/specmatic:/usr/src/app/build/reports/specmatic
-    command: ["test", "--examples", "./examples/async-order-service"]
+    command: ["test"]
