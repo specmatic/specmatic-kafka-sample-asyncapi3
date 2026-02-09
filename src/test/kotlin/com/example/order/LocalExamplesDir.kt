@@ -6,9 +6,11 @@ import java.nio.file.Path
 private const val EXAMPLES_DIR = "EX_DIR"
 
 object LocalExamplesDir {
+    const val DIR_PATH = "build/tmp/specmatic/local-examples"
+
     fun setup() {
         val sourceDir = Path.of("examples")
-        val targetDir = Path.of("build/tmp/specmatic/local-examples")
+        val targetDir = Path.of(DIR_PATH)
 
         if (Files.exists(targetDir)) {
             targetDir.toFile().deleteRecursively()
