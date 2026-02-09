@@ -1,8 +1,6 @@
 package com.example.order
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.condition.EnabledIf
@@ -44,19 +42,7 @@ class ContractTestUsingTestContainer {
             System.getenv("CI") != "true" || System.getProperty("os.name").lowercase().contains("linux")
     }
 
-    private fun isLinuxCI(): Boolean {
-        return System.getenv("CI") == "true" && System.getProperty("os.name").lowercase().contains("linux")
-    }
 
-    @BeforeAll
-    fun setup() {
-        if(isLinuxCI()) LocalExamplesDir.setup()
-    }
-
-    @AfterAll
-    fun tearDown() {
-        if(isLinuxCI()) LocalExamplesDir.tearDown()
-    }
 
     private val testContainer: GenericContainer<*> =
         GenericContainer("specmatic/enterprise")
