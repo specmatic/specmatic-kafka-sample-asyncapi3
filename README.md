@@ -77,6 +77,26 @@ Together, `receive`/`send` plus `before`/`after` lets you express full event beh
 
 You will now see a detailed HTML report in `build/reports/index.html` with the messages that were sent and received as part of the contract tests.
 
+## Run the contract tests using Specmatic Studio
+
+1. Start the Kafka, Service and Studio.
+```shell
+docker compose up
+```
+
+2. Open the [specmatic.yaml](specmatic.yaml) file from the left sidebar, and click on the "Run Suite" button to run the tests against the service.
+
+You should see
+
+```terminaloutput
+Tests run: 4, Successes: 4, Failures: 0, Errors: 0
+```
+
+3. Bring down the Kafka broker after the tests are done.
+```shell
+docker compose down
+```
+
 ## Run the contract tests using specmatic-kafka docker image
 
 1. Start the kafka broker using below command.

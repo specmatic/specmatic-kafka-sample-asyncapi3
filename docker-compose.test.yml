@@ -2,8 +2,6 @@ services:
   kafka:
     image: apache/kafka:latest
     container_name: kafka
-    ports:
-      - "9092:9092"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -50,8 +48,6 @@ services:
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: localhost:9092
       TAX_SERVICE_BASE_URL: http://host.docker.internal:8090
-    ports:
-      - "8080:8080"
     healthcheck:
       test: [ "CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health >/dev/null" ]
       interval: 2s
@@ -64,9 +60,6 @@ services:
     image: specmatic/enterprise:latest
     container_name: studio
     restart: unless-stopped
-    ports:
-      - "9000:9000"
-      - "9001:9001"
     command: ["studio"]
     volumes:
       - .:/usr/src/app
