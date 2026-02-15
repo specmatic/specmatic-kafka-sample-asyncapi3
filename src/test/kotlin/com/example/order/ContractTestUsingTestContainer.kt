@@ -1,15 +1,14 @@
 package com.example.order
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.condition.EnabledIf
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
-import org.testcontainers.containers.BindMode
+import org.testcontainers.containers.BindMode.READ_ONLY
+import org.testcontainers.containers.BindMode.READ_WRITE
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
@@ -49,10 +48,10 @@ class ContractTestUsingTestContainer {
     private val testContainer: GenericContainer<*> =
         GenericContainer("specmatic/enterprise")
             .withCommand("test")
-            .withFileSystemBind("specmatic.yaml", "/usr/src/app/specmatic.yaml", BindMode.READ_ONLY)
-            .withFileSystemBind("specs", "/usr/src/app/specs", BindMode.READ_ONLY)
-            .withFileSystemBind("examples", "/usr/src/app/examples", BindMode.READ_ONLY)
-            .withFileSystemBind("build/reports/specmatic", "/usr/src/app/build/reports/specmatic", BindMode.READ_WRITE)
+            .withFileSystemBind("specmatic.yaml", "/usr/src/app/specmatic.yaml", READ_ONLY)
+            .withFileSystemBind("specs", "/usr/src/app/specs", READ_ONLY)
+            .withFileSystemBind("examples", "/usr/src/app/examples", READ_ONLY)
+            .withFileSystemBind("build/reports/specmatic", "/usr/src/app/build/reports/specmatic", READ_WRITE)
             .waitingFor(Wait.forLogMessage(".*Failed:.*", 1))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }
@@ -61,10 +60,10 @@ class ContractTestUsingTestContainer {
     private val mockContainer: GenericContainer<*> =
         GenericContainer("specmatic/enterprise")
             .withCommand("mock")
-            .withFileSystemBind("specmatic.yaml", "/usr/src/app/specmatic.yaml", BindMode.READ_ONLY)
-            .withFileSystemBind("specs", "/usr/src/app/specs", BindMode.READ_ONLY)
-            .withFileSystemBind("examples", "/usr/src/app/examples", BindMode.READ_ONLY)
-            .withFileSystemBind("build/reports/specmatic/stub", "/usr/src/app/build/reports/specmatic/stub", BindMode.READ_WRITE)
+            .withFileSystemBind("specmatic.yaml", "/usr/src/app/specmatic.yaml", READ_ONLY)
+            .withFileSystemBind("specs", "/usr/src/app/specs", READ_ONLY)
+            .withFileSystemBind("examples", "/usr/src/app/examples", READ_ONLY)
+            .withFileSystemBind("build/reports/specmatic/stub", "/usr/src/app/build/reports/specmatic/stub", READ_WRITE)
             .waitingFor(Wait.forHttp("/actuator/health").forStatusCode(200))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }
