@@ -28,6 +28,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web') {
         exclude group: 'ch.qos.logback', module: 'logback-classic'
     }
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation('org.springframework.boot:spring-boot-starter-webflux') {
         exclude group: 'ch.qos.logback', module: 'logback-classic'
     }
@@ -73,5 +74,14 @@ test {
         }
     }
 }
+
+tasks.named("jar") {
+    enabled = false
+}
+
+tasks.named("bootJar") {
+    archiveFileName = "app.jar"
+}
+
 compileKotlin {
 }

@@ -6,7 +6,7 @@
       "type": "http",
       "wait": "PT1S",
       "http-request": {
-        "baseUrl": "http://localhost:9000",
+        "baseUrl": "http://localhost:8080",
         "path": "/orders",
         "method": "PUT",
         "headers": {

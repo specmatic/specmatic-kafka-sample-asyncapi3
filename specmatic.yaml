@@ -45,9 +45,9 @@ components:
       asyncapi:
         type: test
         servers:
-          - host: "localhost:9092"
+          - host: "${KAFKA_BROKER_HOST:localhost:9092}"
             protocol: kafka
     taxServiceMock:
       openapi:
         type: mock
-        baseUrl: "http://0.0.0.0:8080"
+        baseUrl: "${TAX_SERVICE_URL:http://0.0.0.0:8090}"
