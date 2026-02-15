@@ -44,18 +44,6 @@ class ContractTestUsingTestContainer {
             val isCI = System.getenv("CI") == "true"
             return !isCI || System.getProperty("os.name").lowercase().contains("linux")
         }
-
-        @JvmStatic
-        @BeforeAll
-        fun setUp() {
-            LocalExamplesDir.setup()
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun tearDown() {
-            LocalExamplesDir.tearDown()
-        }
     }
 
     private val testContainer: GenericContainer<*> =
@@ -63,9 +51,8 @@ class ContractTestUsingTestContainer {
             .withCommand("test")
             .withFileSystemBind("specmatic.yaml", "/usr/src/app/specmatic.yaml", BindMode.READ_ONLY)
             .withFileSystemBind("specs", "/usr/src/app/specs", BindMode.READ_ONLY)
-            .withFileSystemBind(LocalExamplesDir.DIR_PATH, "/usr/src/app/${LocalExamplesDir.DIR_PATH}", BindMode.READ_ONLY)
+            .withFileSystemBind("examples", "/usr/src/app/examples", BindMode.READ_ONLY)
             .withFileSystemBind("build/reports/specmatic", "/usr/src/app/build/reports/specmatic", BindMode.READ_WRITE)
-            .withEnv("EX_DIR", LocalExamplesDir.DIR_PATH)
             .waitingFor(Wait.forLogMessage(".*Failed:.*", 1))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }
@@ -76,9 +63,8 @@ class ContractTestUsingTestContainer {
             .withCommand("mock")
             .withFileSystemBind("specmatic.yaml", "/usr/src/app/specmatic.yaml", BindMode.READ_ONLY)
             .withFileSystemBind("specs", "/usr/src/app/specs", BindMode.READ_ONLY)
-            .withFileSystemBind(LocalExamplesDir.DIR_PATH, "/usr/src/app/${LocalExamplesDir.DIR_PATH}", BindMode.READ_ONLY)
+            .withFileSystemBind("examples", "/usr/src/app/examples", BindMode.READ_ONLY)
             .withFileSystemBind("build/reports/specmatic/stub", "/usr/src/app/build/reports/specmatic/stub", BindMode.READ_WRITE)
-            .withEnv("EX_DIR", LocalExamplesDir.DIR_PATH)
             .waitingFor(Wait.forHttp("/actuator/health").forStatusCode(200))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }

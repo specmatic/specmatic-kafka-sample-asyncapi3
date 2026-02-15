@@ -1,8 +1,6 @@
 package com.example.order
 
 import io.specmatic.enterprise.SpecmaticContractTest
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.kafka.test.context.EmbeddedKafka
@@ -27,16 +25,4 @@ import org.springframework.test.annotation.DirtiesContext
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class ContractTest : SpecmaticContractTest {
-    @BeforeAll
-    fun setUp() {
-        LocalExamplesDir.setup()
-    }
-
-    @AfterAll
-    fun tearDown() {
-//        SpecmaticContractTest.teardown()
-//        Thread.sleep(20000)
-        LocalExamplesDir.tearDown()
-    }
-}
+class ContractTest : SpecmaticContractTest
