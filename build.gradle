@@ -22,7 +22,7 @@ dependencies {
     implementation ('org.springframework.boot:spring-boot-starter') {
         exclude group: 'ch.qos.logback', module: 'logback-classic'
     }
-    implementation ('org.springframework.kafka:spring-kafka:3.3.13') {
+    implementation ('org.springframework.kafka:spring-kafka:4.0.3') {
         exclude group: 'org.lz4', module: 'lz4-java'
     }
     implementation('org.springframework.boot:spring-boot-starter-web') {
@@ -39,7 +39,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.27.7")
     testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
     testImplementation("io.specmatic.enterprise:executable:$specmaticEnterpriseVersion")
-    testImplementation("org.springframework.kafka:spring-kafka-test:3.3.13") {
+    testImplementation("org.springframework.kafka:spring-kafka-test:4.0.3") {
         exclude group: 'org.lz4', module: 'lz4-java'
     }
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.5.10")
