@@ -94,7 +94,7 @@ class OrderService(
             add(RecordHeader("orderCorrelationId", "12345".toByteArray(Charsets.UTF_8)))
         }
         val cancellationMessage = """{"reference": ${order.id}, "status": "${order.status}"}"""
-        val record = ProducerRecord<String, String>(CANCELLED_ORDERS_TOPIC, null, null, null, cancellationMessage, headers)
+        val record = ProducerRecord<String, String>(CANCELLED_ORDERS_TOPIC, null, null, order.id.toString(), cancellationMessage, headers)
 
         println("[$SERVICE_NAME] Publishing a message on $CANCELLED_ORDERS_TOPIC topic: $cancellationMessage")
         kafkaTemplate.send(record)
@@ -107,7 +107,7 @@ class OrderService(
         val taskMessage =
             """{"id": ${order.id}, "totalAmount": ${order.totalAmount()}, "status": "${order.status}"}"""
 
-        val record = ProducerRecord<String, String>(WIP_ORDERS_TOPIC, null, null, null, taskMessage, headers)
+        val record = ProducerRecord<String, String>(WIP_ORDERS_TOPIC, null, null, order.id.toString(), taskMessage, headers)
         kafkaTemplate.send(record)
     }
 }

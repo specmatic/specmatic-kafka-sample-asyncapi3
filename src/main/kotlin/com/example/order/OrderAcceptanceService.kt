@@ -16,6 +16,7 @@ class OrderAcceptanceService(
         println("[$SERVICE_NAME] Publishing the acceptance message on topic '$TOPIC_NAME'..")
         kafkaTemplate.send(
             TOPIC_NAME,
+            request.id.toString(),
            ObjectMapper().writeValueAsString(request)
         ).get()
     }
