@@ -57,7 +57,7 @@ services:
     network_mode: host
 
   studio:
-    image: specmatic/enterprise:1.5.1-SNAPSHOT
+    image: specmatic/enterprise:latest
     container_name: studio
     restart: unless-stopped
     command: ["studio"]
