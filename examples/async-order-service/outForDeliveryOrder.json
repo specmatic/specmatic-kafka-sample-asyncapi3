@@ -13,7 +13,7 @@
   "after": [
     {
       "type": "http",
-      "wait": "PT2S",
+      "wait": "PT4S",
       "http-request": {
         "baseUrl": "http://localhost:8080",
         "path": "/orders/456?status=SHIPPED",
@@ -34,7 +34,7 @@
       "type": "http",
       "http-request": {
         "baseUrl": "http://localhost:8090",
-        "path": "/_specmatic/verify?exampleId=tax-invoice-for-order-456",
+        "path": "/_specmatic/verify?exampleIds=tax-invoice-for-order-456",
         "method": "GET"
       },
       "http-response": {
