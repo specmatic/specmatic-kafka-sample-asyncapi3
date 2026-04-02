@@ -38,16 +38,6 @@ class OrderDeliveryService(
         try {
             val request = mapper.readValue(orderDeliveryRequest, OrderDeliveryRequest::class.java)
 
-            // Check if order already processed (idempotency)
-            try {
-                orderRepository.findById(request.orderId, OrderStatus.SHIPPED)
-                println("[$SERVICE_NAME] Order ${request.orderId} already processed with status SHIPPED, skipping")
-                ack.acknowledge()
-                return
-            } catch (_: OrderNotFoundException) {
-                // Order not found, proceed with processing
-            }
-
             val currentStatus = OrderStatus.SHIPPED
 
             val invoice = taxServiceClient.raiseInvoice(
