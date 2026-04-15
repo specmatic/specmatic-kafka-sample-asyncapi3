@@ -10,10 +10,17 @@ plugins {
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
+def snapshotRepoUrl = project.findProperty('snapshotRepoUrl')
 
 repositories {
     mavenCentral()
     mavenLocal()
+
+    if (snapshotRepoUrl) {
+        maven {
+            url = uri(snapshotRepoUrl)
+        }
+    }
 }
 
 ext['kafka.version'] = '3.9.1'
