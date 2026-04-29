@@ -47,6 +47,21 @@ components:
         servers:
           - host: "${KAFKA_BROKER_HOST:localhost:9092}"
             protocol: kafka
+            # Optional broker-level admin properties used by Specmatic to manage topics.
+            # Example keys: security.protocol, sasl.mechanism, sasl.jaas.config.
+            # adminCredentials:
+            #   security.protocol: SASL_PLAINTEXT
+            #   sasl.mechanism: PLAIN
+            # Optional Kafka client properties for test consumers and producers.
+            # client:
+            #   consumer:
+            #     group.id: specmatic-tests
+            #   producer:
+            #     acks: all
+        # Optional wait time in milliseconds before tests begin, to allow subscribers to connect.
+        # subscriberReadinessWaitTime: 5000
+        # Optional timeout in milliseconds to wait for a reply message on the reply topic.
+        # replyTimeout: 10000
     taxServiceMock:
       openapi:
         type: mock
