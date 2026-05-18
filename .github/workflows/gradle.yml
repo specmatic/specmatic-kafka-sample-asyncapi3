@@ -1,11 +1,28 @@
 
 name: Java CI with Gradle
 
+run-name: ${{ inputs.orchestrator_run_suffix && format('Java CI with Gradle - {0}', inputs.orchestrator_run_suffix) || github.workflow }}
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      enterprise_version:
+        description: Specmatic Enterprise version under test
+        required: false
+        type: string
+
+      enterprise_artifact_url:
+        description: Specmatic Enterprise jar/artifact URL under test
+        required: false
+        type: string
+
+      orchestrator_run_suffix:
+        description: Test orchestrator run suffix
+        required: false
+        type: string
 
 jobs:
   build:
@@ -13,9 +30,19 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      ENTERPRISE_VERSION: ${{ inputs.enterprise_version }}
+      ENTERPRISE_ARTIFACT_URL: ${{ inputs.enterprise_artifact_url }}
 
     steps:
     - uses: actions/checkout@v6
+
+    - name: Add orchestrator context to summary
+      if: ${{ inputs.orchestrator_run_suffix != '' }}
+      run: |
+        echo "### Orchestrator" >> "$GITHUB_STEP_SUMMARY"
+        echo "Run: ${{ inputs.orchestrator_run_suffix }}" >> "$GITHUB_STEP_SUMMARY"
+
     - name: Set up JDK 17
       uses: actions/setup-java@v5
       with:
@@ -32,8 +59,37 @@ jobs:
         mkdir -p ~/.specmatic
         echo "${{ secrets.SPECMATIC_LICENSE_KEY }}" > ~/.specmatic/specmatic-license.txt
 
+    - name: Prepare Specmatic Enterprise artifact
+      if: ${{ inputs.enterprise_artifact_url != '' && inputs.enterprise_version != '' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        mkdir -p ~/.specmatic
+        
+        echo "Downloading Enterprise artifact from:"
+        echo "${ENTERPRISE_ARTIFACT_URL}"
+        echo "Retry configuration: 3 retries with 15 second delay"
+
+        curl -L --fail --retry 3 --retry-delay 15 \
+          "${ENTERPRISE_ARTIFACT_URL}" \
+          -o ~/.specmatic/specmatic-enterprise.jar
+
+        mvn install:install-file \
+          -Dfile="$HOME/.specmatic/specmatic-enterprise.jar" \
+          -DgroupId=io.specmatic.enterprise \
+          -DartifactId=executable \
+          -Dversion="${ENTERPRISE_VERSION}" \
+          -Dpackaging=jar \
+          -DgeneratePom=true
+
+        echo "Installed Enterprise artifact into local Maven"
+
     - name: Build with Gradle Wrapper
-      run: ./gradlew build
+      run: |
+        ./gradlew build \
+            ${ENTERPRISE_VERSION:+-PspecmaticEnterpriseVersion=${ENTERPRISE_VERSION}} \
+            ${ENTERPRISE_VERSION:+-PenterpriseVersion=${ENTERPRISE_VERSION}}
 
     - name: Upload target jar for Docker
       uses: actions/upload-artifact@v6
@@ -57,7 +113,7 @@ jobs:
         report-path: './build/reports/specmatic/async/test/ctrf/*.json'
 
     - name: Run Specmatic Insights Build Reporter
-      if: github.ref == 'refs/heads/main'
+      if: ${{ github.ref == 'refs/heads/main' && inputs.orchestrator_run_suffix == '' }}
       run: |
         docker run \
           -v ${{ github.workspace }}:/usr/src/app \
@@ -71,7 +127,7 @@ jobs:
           --repo-url ${{ github.event.repository.html_url }}
 
   docker:
-    if: github.ref == 'refs/heads/main'
+    if: ${{ github.ref == 'refs/heads/main' && inputs.orchestrator_run_suffix == '' }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
