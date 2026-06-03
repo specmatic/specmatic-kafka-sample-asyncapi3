@@ -75,7 +75,7 @@ Together, `receive`/`send` plus `before`/`after` lets you express full event beh
 ./gradlew test --tests="com.example.order.ContractTestUsingTestContainer"
 ```
 
-You will now see a detailed HTML report in `build/reports/index.html` with the messages that were sent and received as part of the contract tests.
+You will now see a detailed HTML report in `build/reports/specmatic/async/test/html/index.html` with the messages that were sent and received as part of the contract tests.
 
 ## Run the contract tests using Specmatic Studio
 
