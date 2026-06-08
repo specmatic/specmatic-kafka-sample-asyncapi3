@@ -43,10 +43,17 @@ class ContractTestUsingTestContainer {
             val isCI = System.getenv("CI") == "true"
             return !isCI || System.getProperty("os.name").lowercase().contains("linux")
         }
+
+        private fun enterpriseImage(): String =
+            if (!System.getenv("ENTERPRISE_ARTIFACT_URL").isNullOrEmpty()) {
+                "specmatic/enterprise-snapshot"
+            } else {
+                "specmatic/enterprise"
+            }
     }
 
     private val testContainer: GenericContainer<*> =
-        GenericContainer("specmatic/enterprise")
+        GenericContainer(enterpriseImage())
             .withCommand("test")
             .withFileSystemBind("specmatic.yaml", "/usr/src/app/specmatic.yaml", READ_ONLY)
             .withFileSystemBind("specs", "/usr/src/app/specs", READ_ONLY)
@@ -58,7 +65,7 @@ class ContractTestUsingTestContainer {
 
     @Container
     private val mockContainer: GenericContainer<*> =
-        GenericContainer("specmatic/enterprise")
+        GenericContainer(enterpriseImage())
             .withCommand("mock")
             .withFileSystemBind("specmatic.yaml", "/usr/src/app/specmatic.yaml", READ_ONLY)
             .withFileSystemBind("specs", "/usr/src/app/specs", READ_ONLY)
