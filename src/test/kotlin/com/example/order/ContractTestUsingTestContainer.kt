@@ -44,12 +44,7 @@ class ContractTestUsingTestContainer {
             return !isCI || System.getProperty("os.name").lowercase().contains("linux")
         }
 
-        private fun enterpriseImage(): String =
-            if (!System.getenv("ENTERPRISE_ARTIFACT_URL").isNullOrEmpty()) {
-                "specmatic/enterprise-snapshot"
-            } else {
-                "specmatic/enterprise"
-            }
+        private fun enterpriseImage(): String = "specmatic/enterprise"
     }
 
     private val testContainer: GenericContainer<*> =
