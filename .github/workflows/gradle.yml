@@ -15,7 +15,7 @@ on:
         type: string
 
       enterprise_artifact_url:
-        description: Specmatic Enterprise jar/artifact URL under test
+        description: Deprecated fat-jar artifact URL input; retained for workflow compatibility
         required: false
         type: string
 
@@ -30,18 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    env:
-      ENTERPRISE_VERSION: ${{ inputs.enterprise_version }}
-      ENTERPRISE_ARTIFACT_URL: ${{ inputs.enterprise_artifact_url }}
 
     steps:
     - uses: actions/checkout@v6
-
-    - name: Add orchestrator context to summary
-      if: ${{ inputs.orchestrator_run_suffix != '' }}
-      run: |
-        echo "### Orchestrator" >> "$GITHUB_STEP_SUMMARY"
-        echo "Run: ${{ inputs.orchestrator_run_suffix }}" >> "$GITHUB_STEP_SUMMARY"
 
     - name: Set up JDK 17
       uses: actions/setup-java@v5
@@ -59,45 +50,24 @@ jobs:
         mkdir -p ~/.specmatic
         echo "${{ secrets.SPECMATIC_LICENSE_KEY }}" > ~/.specmatic/specmatic-license.txt
 
-    - name: Prepare Specmatic Enterprise artifact
-      if: ${{ inputs.enterprise_artifact_url != '' && inputs.enterprise_version != '' }}
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        mkdir -p ~/.specmatic
-        url="${ENTERPRISE_ARTIFACT_URL}"
-        output_path="$HOME/.specmatic/specmatic-enterprise.jar"
-        echo "Downloading Enterprise artifact from:"
-        echo "$url"
-
-        initial_sleep=$(( RANDOM % 31 ))
-        echo "Initial jitter: ${initial_sleep}s"
-        sleep "$initial_sleep"
-
-        echo "Download attempt 1/1"
-        curl --http1.1 -L --fail --continue-at - "$url" -o "$output_path"
-        echo "Enterprise artifact downloaded successfully"
-
-        mvn install:install-file \
-          -Dfile="$HOME/.specmatic/specmatic-enterprise.jar" \
-          -DgroupId=io.specmatic.enterprise \
-          -DartifactId=executable \
-          -Dversion="${ENTERPRISE_VERSION}" \
-          -Dpackaging=jar \
-          -DgeneratePom=true
-
-        echo "Installed Enterprise artifact into local Maven"
-
-    - name: Docker Login for snapshot image
-      if: ${{ inputs.enterprise_artifact_url != '' && github.ref == 'refs/heads/main' }}
-      run: echo ${{ secrets.SPECMATIC_DOCKER_HUB_TOKEN }} | docker login -u ${{ vars.SPECMATIC_DOCKER_HUB_USERNAME }} --password-stdin
+    # Start: internal setup required by Specmatic. Sample project users can ignore this block.
+    - if: ${{ inputs.orchestrator_run_suffix != '' }}
+      uses: specmatic/specmatic-github-workflows/action-orchestrator-setup@main
+      with:
+        orchestrator-run-suffix: ${{ inputs.orchestrator_run_suffix }}
+        enterprise-version: ${{ inputs.enterprise_version }}
+        gradle-snapshot-init-script-path: ./gradle/specmatic-snapshots.init.gradle
+        docker-hub-username: ${{ vars.SPECMATIC_DOCKER_HUB_USERNAME }}
+        docker-hub-token: ${{ secrets.SPECMATIC_DOCKER_HUB_TOKEN }}
+        setup-snapshot-docker-image: 'true'
+    # End: internal setup required by Specmatic.
 
     - name: Build with Gradle Wrapper
+      env:
+        ENTERPRISE_VERSION: ${{ inputs.enterprise_version }}
       run: |
         ./gradlew build \
-            ${ENTERPRISE_VERSION:+-PspecmaticEnterpriseVersion=${ENTERPRISE_VERSION}} \
-            ${ENTERPRISE_VERSION:+-PenterpriseVersion=${ENTERPRISE_VERSION}}
+            ${ENTERPRISE_VERSION:+-PspecmaticEnterpriseVersion=${ENTERPRISE_VERSION}}
 
     - name: Upload target jar for Docker
       uses: actions/upload-artifact@v6
