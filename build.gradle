@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id 'org.springframework.boot' version '3.5.15'
+    id 'org.springframework.boot' version '3.5.16'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.jetbrains.kotlin.jvm' version '2.4.0'
     id 'org.jetbrains.kotlin.plugin.spring' version '2.4.0'
@@ -43,7 +43,7 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka-test:3.3.16") {
         exclude group: 'org.lz4', module: 'lz4-java'
     }
-    testImplementation("org.springframework.boot:spring-boot-starter-test:3.5.15")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.5.16")
     testImplementation "org.testcontainers:junit-jupiter:1.21.4"
 }
 
