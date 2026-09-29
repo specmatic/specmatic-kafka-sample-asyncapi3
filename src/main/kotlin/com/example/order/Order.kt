@@ -1,7 +1,7 @@
 package com.example.order
 
 import java.math.BigDecimal
-import java.time.LocalDateTime.now
+import java.time.Instant.now
 
 data class Order(
     val id: Int,

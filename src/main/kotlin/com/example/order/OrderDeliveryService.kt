@@ -7,6 +7,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 private const val SERVICE_NAME = "OrderDeliveryService"
 private const val ORDER_OUT_FOR_DELIVERY_TOPIC = "out-for-delivery-orders"
@@ -52,7 +54,8 @@ class OrderDeliveryService(
             orderRepository.save(
                 Order(
                     id = request.orderId,
-                    lastUpdatedDate = request.deliveryDate,
+                    lastUpdatedDate = LocalDate.parse(request.deliveryDate)
+                        .atStartOfDay(ZoneOffset.UTC).toInstant().toString(),
                     status = currentStatus
                 )
             )
