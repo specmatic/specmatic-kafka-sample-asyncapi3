@@ -24,7 +24,7 @@
         "body": {
           "id": "$match(exact: 456)",
           "orderItems": [],
-          "lastUpdatedDate": "$match(dataType: datetime)",
+          "lastUpdatedDate": "$match(dataType: date)",
           "status": "$match(exact: SHIPPED)"
         }
       },
