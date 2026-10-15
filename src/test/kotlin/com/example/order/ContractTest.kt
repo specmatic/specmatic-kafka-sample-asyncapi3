@@ -1,8 +1,12 @@
 package com.example.order
 
 import io.specmatic.enterprise.SpecmaticContractTest
+import org.awaitility.Awaitility.await
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.http.HttpStatus
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
 
@@ -25,4 +29,12 @@ import org.springframework.test.annotation.DirtiesContext
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class ContractTest : SpecmaticContractTest
+class ContractTest : SpecmaticContractTest {
+    @BeforeAll
+    fun awaitHealth() {
+        val client = TestRestTemplate()
+        await().atMost(java.time.Duration.ofSeconds(30)).until {
+            client.getForEntity("http://localhost:8080/actuator/health", String::class.java).statusCode == HttpStatus.OK
+        }
+    }
+}
