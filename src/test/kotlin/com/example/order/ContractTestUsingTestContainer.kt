@@ -2,9 +2,12 @@ package com.example.order
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.condition.EnabledIf
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.http.HttpStatus
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
 import org.testcontainers.containers.BindMode.READ_ONLY
@@ -54,6 +57,7 @@ class ContractTestUsingTestContainer {
             .withFileSystemBind("specs", "/usr/src/app/specs", READ_ONLY)
             .withFileSystemBind("examples", "/usr/src/app/examples", READ_ONLY)
             .withFileSystemBind("build/reports/specmatic", "/usr/src/app/build/reports/specmatic", READ_WRITE)
+            .withFileSystemBind("${System.getProperty("user.home")}/.specmatic", "/root/.specmatic", READ_ONLY)
             .waitingFor(Wait.forLogMessage(".*Failed:.*", 1))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }
@@ -66,6 +70,7 @@ class ContractTestUsingTestContainer {
             .withFileSystemBind("specs", "/usr/src/app/specs", READ_ONLY)
             .withFileSystemBind("examples", "/usr/src/app/examples", READ_ONLY)
             .withFileSystemBind("build/reports/specmatic/stub", "/usr/src/app/build/reports/specmatic/stub", READ_WRITE)
+            .withFileSystemBind("${System.getProperty("user.home")}/.specmatic", "/root/.specmatic", READ_ONLY)
             .waitingFor(Wait.forHttp("/actuator/health").forStatusCode(200))
             .withNetworkMode("host")
             .withLogConsumer { print(it.utf8String) }
@@ -75,5 +80,13 @@ class ContractTestUsingTestContainer {
     fun specmaticContractTest() {
         testContainer.start()
         assertThat(testContainer.logs).contains("Failed: 0").doesNotContain("Passed: 0")
+    }
+
+    @BeforeAll
+    fun awaitHealth() {
+        val client = TestRestTemplate()
+        org.awaitility.Awaitility.await().atMost(java.time.Duration.ofSeconds(30)).until {
+            client.getForEntity("http://localhost:8080/actuator/health", String::class.java).statusCode == HttpStatus.OK
+        }
     }
 }
