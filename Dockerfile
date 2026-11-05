@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17.0.20_8-jre
+FROM eclipse-temurin:17.0.21_9-jre
 WORKDIR /app
 COPY build/libs/*.jar /app/app.jar
 EXPOSE 8080 8080
